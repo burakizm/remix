@@ -11,4 +11,5 @@ export default cleanEnv(process.env, {
     LOCALE: str({ default: "en" }),
     MAX_PLAYLIST_SIZE: num({ default: 10 }),
     COOKIES: str({ default: "" }),
+    SOCKET_PORT: num({ default: 8080 }),
 });

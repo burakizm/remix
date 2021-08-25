@@ -1,5 +1,6 @@
 import { Readable } from "stream";
 import { User } from "@grammyjs/types";
+import { sendUpdate } from "../io";
 
 export interface Item {
     getReadable: () => Promise<Readable> | Readable;
@@ -9,6 +10,10 @@ export interface Item {
 }
 
 export type NowHandler = (chatId: number, now: Item) => Promise<void>;
+
+function escapeItem(item: Item) {
+    return { url: item.url, title: item.title, requester: item.requester };
+}
 
 export default new (class Queues {
     queues: Map<number, Item[]> = new Map();
@@ -22,9 +27,11 @@ export default new (class Queues {
     setNow(chatId: number, item: Item) {
         this.now.set(chatId, item);
         this.nowHandlers.forEach((handler) => handler(chatId, item));
+        sendUpdate(chatId, "now", escapeItem(item));
     }
 
     rmNow(chatId: number) {
+        sendUpdate(chatId, "rmNow");
         return this.now.delete(chatId);
     }
 
@@ -34,6 +41,8 @@ export default new (class Queues {
 
     push(chatId: number, item: Item) {
         const queue = this.queues.get(chatId);
+
+        sendUpdate(chatId, "pushedItem", escapeItem(item));
 
         if (queue) {
             queue.push(item);
@@ -72,6 +81,7 @@ export default new (class Queues {
 
     clear(chatId: number) {
         this.rmNow(chatId);
+        sendUpdate(chatId, "cleared");
 
         if (this.queues.has(chatId)) {
             this.queues.set(chatId, []);
