@@ -3,6 +3,7 @@ import { Composer } from "grammy";
 import controls from "./controls";
 import end from "./end";
 import now from "./now";
+import start from './start';
 import panel from "./panel";
 import playlist from "./playlist";
 import shuffle from "./shuffle";
@@ -18,6 +19,7 @@ composer
     .use(controls)
     .use(end)
     .use(now)
+    .use(start)
     .use(panel)
     .use(playlist)
     .use(shuffle)
